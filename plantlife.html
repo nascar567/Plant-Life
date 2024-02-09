@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Virtual Plant Care Assistant</title>
+  <style>
+    #plant-container {
+      display: flex;
+      align-items: center;
+    }
+
+    #plant {
+      font-size: 24px;
+      margin: 20px;
+      transition: all 0.5s;
+    }
+
+    #bars {
+      display: flex;
+      flex-direction: column;
+      margin-left: 20px;
+    }
+
+    .bar-container {
+      margin-bottom: 10px;
+    }
+
+    .label {
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .bar {
+      height: 20px;
+      width: 100px;
+      position: relative;
+      transition: width 0.5s;
+    }
+
+    .bar-value {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    #health-bar {
+      background-color: #FF5733; /* orange color for health bar */
+    }
+
+    #water-bar {
+      background-color: #3498DB; /* blue color for water bar */
+    }
+
+    #sunlight-bar {
+      background-color: #F4D03F; /* yellow color for sunlight bar */
+    }
+  </style>
+</head>
+<body>
+
+<div id="plant-container">
+  <div id="plant">🌱</div>
+  <div id="bars">
+    <div class="bar-container">
+      <div class="label">Health</div>
+      <div class="bar" id="health-bar">
+        <div class="bar-value">0</div>
+      </div>
+    </div>
+    <div class="bar-container">
+      <div class="label">Water</div>
+      <div class="bar" id="water-bar"></div>
+    </div>
+    <div class="bar-container">
+      <div class="label">Sunlight</div>
+      <div class="bar" id="sunlight-bar"></div>
+    </div>
+  </div>
+</div>
+<button onclick="waterPlant()">Water</button>
+<button onclick="sunlightPlant()">Sunlight</button>
+<button onclick="checkHealth()">Check Health</button>
+
+<script>
+  let plantState = {
+    waterLevel: 50,
+    sunlightExposure: 50,
+    health: 20,
+    actionsDisabled: false
+  };
+
+  function updatePlant() {
+    const plantElement = document.getElementById("plant");
+    const healthBar = document.getElementById("health-bar");
+    const waterBar = document.getElementById("water-bar");
+    const sunlightBar = document.getElementById("sunlight-bar");
+
+    if (plantState.health > 250) {
+      plantElement.innerHTML = '🥀';
+      disableActions();
+      alert("Sorry, your plant has died!");
+    } else if (plantState.health > 140) {
+      plantElement.innerHTML = '🌻';
+    } else if (plantState.health > 120) {
+      plantElement.innerHTML = '🪴';
+    } else {
+      plantElement.innerHTML = '🌱';
+    }
+
+    plantElement.style.fontSize = `${plantState.health}px`;
+
+    healthBar.style.width = `${plantState.health}px`;
+    healthBar.querySelector('.bar-value').textContent = plantState.health;
+
+    waterBar.style.width = `${plantState.waterLevel}px`;
+    sunlightBar.style.width = `${plantState.sunlightExposure}px`;
+
+    if (plantState.health < 5) {
+      alert("Oh no! Your plant died because you forgot to take care of it!");
+      disableActions();
+    }
+  }
+
+  function waterPlant() {
+    if (!plantState.actionsDisabled) {
+      plantState.waterLevel += 10;
+      updateHealth();
+    }
+  }
+
+  function sunlightPlant() {
+    if (!plantState.actionsDisabled) {
+      plantState.sunlightExposure += 10;
+      updateHealth();
+    }
+  }
+
+  function checkHealth() {
+    alert(`Plant Health: ${plantState.health}`);
+  }
+
+  function updateHealth() {
+    plantState.health = (plantState.waterLevel + plantState.sunlightExposure) / 2;
+    updatePlant();
+  }
+
+  function disableActions() {
+    plantState.actionsDisabled = true;
+    document.querySelectorAll('button').forEach(btn => (btn.disabled = true));
+  }
+
+  function replant() {
+    plantState = {
+      waterLevel: 50,
+      sunlightExposure: 50,
+      health: 20,
+      actionsDisabled: false
+    };
+    enableActions();
+    updatePlant();
+  }
+
+  function enableActions() {
+    document.querySelectorAll('button').forEach(btn => (btn.disabled = false));
+  }
+
+  setInterval(function () {
+    if (!plantState.actionsDisabled) {
+      plantState.health -= 15;
+      updatePlant();
+    }
+  }, 5000); // Update every 10 seconds
+</script>
+
+<button onclick="replant()">Replant</button>
+
+</body>
+</html>
